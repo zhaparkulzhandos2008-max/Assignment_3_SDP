@@ -1,0 +1,33 @@
+@startuml
+skinparam classAttributeIconSize 0
+interface MessageSender <<Implementor>> {
+  +sendMessage(recipient: String, title: String, body: String): boolean
+  +isAvailable(): boolean
+  +getChannelName(): String
+}
+abstract class Notification <<Abstraction>> {
+  #sender: MessageSender
+  +setSender(sender: MessageSender): void
+  +send(recipient: String, message: String): void
+}
+Notification o--> MessageSender : Bridge (has-a)
+Notification <|-- UrgentNotification
+Notification <|-- EncryptedNotification
+Notification <|-- ScheduledBatchNotification
+Notification <|-- MarketingNotification
+UrgentNotification o--> MessageSender : fallbackSender
+MessageSender <|.. AbstractSimulatedSender
+AbstractSimulatedSender <|-- TelegramMessageSender
+AbstractSimulatedSender <|-- EmailMessageSender
+AbstractSimulatedSender <|-- SmsMessageSender
+AbstractSimulatedSender <|-- KafkaEventSender
+AbstractSimulatedSender <|-- PushNotificationSender
+note bottom of Notification
+  Refined Abstractions: Urgent, Encrypted,
+  ScheduledBatch, Marketing
+end note
+note bottom of MessageSender
+  Concrete Implementors: Telegram, Email,
+  SMS, Kafka, Push
+end note
+@enduml
